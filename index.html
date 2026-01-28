@@ -11,14 +11,29 @@
 <h5>Voter Search</h5>
 
 <div class="row g-2 mb-3">
-  <div class="col"><input id="voterId" class="form-control" placeholder="Voter ID"></div>
-  <div class="col"><input id="firstName" class="form-control" placeholder="First Name"></div>
-  <div class="col"><input id="lastName" class="form-control" placeholder="Last Name"></div>
-  <div class="col"><input id="fatherName" class="form-control" placeholder="Father Name"></div>
-  <div class="col"><input id="caste" class="form-control" placeholder="Caste"></div>
+  <div class="col-12 col-md">
+    <input id="voterId" class="form-control" placeholder="Voter ID">
+  </div>
+  <div class="col-12 col-md">
+    <input id="firstName" class="form-control" placeholder="First Name">
+  </div>
+  <div class="col-12 col-md">
+    <input id="lastName" class="form-control" placeholder="Last Name">
+  </div>
+  <div class="col-12 col-md">
+    <input id="fatherName" class="form-control" placeholder="Father Name">
+  </div>
+  <div class="col-12 col-md">
+    <input id="caste" class="form-control" placeholder="Caste">
+  </div>
 </div>
 
+
 <button class="btn btn-primary mb-3" onclick="applySearch()">Search</button>
+<div id="spinner" class="text-center my-3 d-none">
+  <div class="spinner-border text-primary" role="status"></div>
+  <div>Loading...</div>
+</div>
 
 <table class="table table-bordered table-sm">
   <thead>
@@ -31,7 +46,7 @@
       <th>View</th>
     </tr>
   </thead>
-  <tbody id="tableBody"></tbody>
+   <tbody id="tableBody"></tbody>
 </table>
 
 <!-- MODAL -->
@@ -62,12 +77,26 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwX9qI1RE_M1zjq7c4BMfqC
 let allData = [];
 let selected = null;
 
-fetch(API_URL).then(r => r.json()).then(d => {
-  allData = d;
-  render(d);
-});
+showSpinner();
+fetch(API_URL)
+  .then(r => r.json())
+  .then(d => {
+    allData = d;
+    render(d);
+  })
+  .finally(hideSpinner);
+
+function showSpinner() {
+  document.getElementById('spinner').classList.remove('d-none');
+}
+
+function hideSpinner() {
+  document.getElementById('spinner').classList.add('d-none');
+}
 
 function applySearch() {
+  showSpinner();
+
   let f = {
     voterId: voterId.value,
     firstName: firstName.value,
@@ -83,7 +112,9 @@ function applySearch() {
   );
 
   render(filtered);
+  hideSpinner();
 }
+
 
 function render(data) {
   tableBody.innerHTML = data.map(r => `
